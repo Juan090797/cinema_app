@@ -1,99 +1,33 @@
-import 'package:cinema_app/presentation/providers/providers.dart';
+import 'package:cinema_app/presentation/views/views.dart';
 import 'package:cinema_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeScreen extends StatelessWidget {
   static const name = 'home-screen';
 
-  const HomeScreen({super.key});
+  //final Widget childView;
+  final int pageIndex;
+
+  const HomeScreen({
+    super.key, 
+    required this.pageIndex
+  });
+
+  final viewRoutes = const <Widget>[
+    HomeView(),
+    SizedBox(), // Placeholder for the second view
+    FavoritesView(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _HomeView(),
-      bottomNavigationBar: CustomBottomNavigation(),
+    return Scaffold(
+      body: IndexedStack(
+        index: pageIndex,
+        children: viewRoutes,
+      ),
+      bottomNavigationBar: CustomBottomNavigation( currentIndex: pageIndex),
     );
   }
 }
 
-class _HomeView extends ConsumerStatefulWidget {
-  const _HomeView();
-
-  @override
-  _HomeViewState createState() => _HomeViewState();
-}
-
-class _HomeViewState extends ConsumerState<_HomeView> {
-  @override
-  void initState() {
-    super.initState();
-
-    ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-    ref.read(popularMoviesProvider.notifier).loadNextPage();
-    ref.read( topRatedMoviesProvider.notifier ).loadNextPage();
-    ref.read( upcomingMoviesProvider.notifier ).loadNextPage();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    final initialLoading = ref.watch(initialLoadingProvider);
-
-    if (initialLoading) return const FullScreenLoader();
-
-    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
-    final slideShowMovies = ref.watch(moviesSlideshowProvider);
-    final popularMovies = ref.watch(popularMoviesProvider);
-    final topRatedMovies = ref.watch(topRatedMoviesProvider);
-    final upcomingMovies = ref.watch(upcomingMoviesProvider); 
-
-    return CustomScrollView(
-      slivers: [
-
-      const SliverAppBar(
-        floating: true,
-        flexibleSpace: FlexibleSpaceBar(
-          title: CustomAppbar(),
-        ),
-      ),    
-
-      SliverList(delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return Column(
-            children: [
-              //const CustomAppbar(),
-              MoviesSlideShow(movies: slideShowMovies),
-              MoviesHorizontalListview(
-                  movies: nowPlayingMovies,
-                  title: 'En cines',
-                  subTitle: 'Lunes 20',
-                  loadNextPage: () => ref.read(nowPlayingMoviesProvider.notifier).loadNextPage()
-              ),
-              MoviesHorizontalListview(
-                  movies: topRatedMovies,
-                  title: 'Próximamente',
-                  subTitle: 'En este mes',
-                  loadNextPage: () => ref.read(topRatedMoviesProvider.notifier).loadNextPage()
-              ),
-              MoviesHorizontalListview(
-                  movies: popularMovies,
-                  title: 'Populares',
-                  //subTitle: 'En este mes',
-                  loadNextPage: () => ref.read(popularMoviesProvider.notifier).loadNextPage()
-              ),
-              MoviesHorizontalListview(
-                  movies: upcomingMovies,
-                  title: 'Mejor calificadas',
-                  subTitle: 'De todos los tiempos',
-                  loadNextPage: () => ref.read(upcomingMoviesProvider.notifier).loadNextPage()
-              ),
-              const SizedBox(height: 10),
-            ],
-          );
-        },
-        childCount: 1,
-      )),
-    ]);
-  }
-}

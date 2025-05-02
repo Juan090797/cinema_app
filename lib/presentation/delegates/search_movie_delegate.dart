@@ -114,12 +114,6 @@ class SearchMovieDelegate extends SearchDelegate<Movie?>{
 
         },
       ),
-      
-       
-        
-
-
-
     ];
   }
 

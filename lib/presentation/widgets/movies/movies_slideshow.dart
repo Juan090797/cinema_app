@@ -3,11 +3,11 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:cinema_app/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
 
-class MoviesSlideShow extends StatelessWidget {
+class MoviesSlideshow extends StatelessWidget {
 
   final List<Movie> movies;
 
-  const MoviesSlideShow({super.key, required this.movies});
+  const MoviesSlideshow({super.key, required this.movies});
 
   @override
   Widget build(BuildContext context) {

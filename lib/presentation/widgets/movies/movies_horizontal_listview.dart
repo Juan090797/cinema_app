@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:cinema_app/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
 
-class MoviesHorizontalListview extends StatefulWidget {
+class MovieHorizontalListview extends StatefulWidget {
   final List<Movie> movies;
   final String? title;
   final String? subTitle;
   final VoidCallback? loadNextPage;
 
-  const MoviesHorizontalListview({
+  const MovieHorizontalListview({
     super.key,
     required this.movies,
     this.title,
@@ -19,11 +19,11 @@ class MoviesHorizontalListview extends StatefulWidget {
   });
 
   @override
-  State<MoviesHorizontalListview> createState() =>
+  State<MovieHorizontalListview> createState() =>
       _MoviesHorizontalListviewState();
 }
 
-class _MoviesHorizontalListviewState extends State<MoviesHorizontalListview> {
+class _MoviesHorizontalListviewState extends State<MovieHorizontalListview> {
   final scrollController = ScrollController();
 
   @override
@@ -103,7 +103,7 @@ class _Slide extends StatelessWidget {
                     );
                   }
                   return GestureDetector(
-                    onTap: () => context.push('/movie/${ movie.id }'),
+                    onTap: () => context.push('/home/0/movie/${ movie.id }'),
                     child: FadeIn(child: child),
                   );
                 },
