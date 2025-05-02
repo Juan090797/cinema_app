@@ -1,9 +1,10 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinema_app/config/helpers/human_formats.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cinema_app/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
 
-class MoviesHorizontalListview extends StatelessWidget {
+class MoviesHorizontalListview extends StatefulWidget {
   final List<Movie> movies;
   final String? title;
   final String? subTitle;
@@ -18,21 +19,50 @@ class MoviesHorizontalListview extends StatelessWidget {
   });
 
   @override
+  State<MoviesHorizontalListview> createState() =>
+      _MoviesHorizontalListviewState();
+}
+
+class _MoviesHorizontalListviewState extends State<MoviesHorizontalListview> {
+  final scrollController = ScrollController();
+
+  @override
+  initState() {
+    super.initState();
+    scrollController.addListener(() {
+      if (widget.loadNextPage == null) return;
+
+      if ((scrollController.position.pixels + 200) >= scrollController.position.maxScrollExtent) {
+        widget.loadNextPage!();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 350,
       child: Column(
         children: [
-          if (title != null || subTitle != null)
-            _Title(title: title,subTitle: subTitle,),
-
+          if (widget.title != null || widget.subTitle != null)
+            _Title(
+              title: widget.title,
+              subTitle: widget.subTitle,
+            ),
           Expanded(
             child: ListView.builder(
-              itemCount: movies.length,
+              controller: scrollController,
+              itemCount: widget.movies.length,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                return _Slide(movie: movies[index]);
+                return FadeInRight(child: _Slide(movie: widget.movies[index]));
               },
             ),
           )
@@ -64,21 +94,25 @@ class _Slide extends StatelessWidget {
                 movie.posterPath,
                 fit: BoxFit.cover,
                 width: 150,
-                loadingBuilder: (context, child, loadingProgress){
-                  if (loadingProgress != null){
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress != null) {
                     return const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2)),
                     );
                   }
-                  return FadeIn(child: child);
+                  return GestureDetector(
+                    onTap: () => context.push('/movie/${ movie.id }'),
+                    child: FadeIn(child: child),
+                  );
                 },
               ),
             ),
           ),
-
-          const SizedBox(height: 5,),
-
+          const SizedBox(
+            height: 5,
+          ),
           SizedBox(
             width: 150,
             child: Text(
@@ -87,18 +121,20 @@ class _Slide extends StatelessWidget {
               style: textStyles.titleSmall,
             ),
           ),
-
           Row(
             children: [
               Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
               const SizedBox(width: 3),
-              Text('${movie.voteAverage}', style: textStyles.bodyMedium?.copyWith( color: Colors.yellow.shade800),),
+              Text(
+                '${movie.voteAverage}',
+                style: textStyles.bodyMedium
+                    ?.copyWith(color: Colors.yellow.shade800),
+              ),
               const SizedBox(width: 10),
-              Text( HumanFormats.number(movie.popularity), style: textStyles.bodySmall)
+              Text(HumanFormats.number(movie.popularity),
+                  style: textStyles.bodySmall)
             ],
           )
-
-
         ],
       ),
     );
